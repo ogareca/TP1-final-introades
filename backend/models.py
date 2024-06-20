@@ -1,5 +1,5 @@
-import datetime
 from flask_sqlalchemy import SQLAlchemy
+
 
 
 db= SQLAlchemy()
@@ -12,7 +12,7 @@ class User(db.Model):
     id_ArcherTowe=db.Column(db.Integer, db.ForeignKey('archer_tower.id_AT'),default=1)
     id_Canon=db.Column(db.Integer, db.ForeignKey('canon.id_Canon'),default=1)
     id_Wizard=db.Column(db.Integer, db.ForeignKey('wizard_tower.id_WT'),default=1)
-    fecha_creacion=db.Column(db.DateTime, default=datetime.datetime.now())
+    money=db.Column(db.Integer, default=0)
 
 
 #Town Hall =TH = ayuntamiento
@@ -21,8 +21,8 @@ class TownHall(db.Model):
     id_th= db.Column(db.Integer, primary_key=True)
     TH_hp=db.Column(db.Integer,nullable=False)
     img=db.Column(db.String(255),nullable=False)
-    Time_Upgrade=db.Column(db.DateTime, nullable=False)
-    fecha_mejora=db.Column(db.DateTime, default=datetime.datetime.now())
+    upgrade_TH=db.Column(db.Integer, nullable=False)
+    moneygiven_TH=db.Column(db.Integer,nullable=False)
 
 
 #AT = Archer Tower    
@@ -33,8 +33,8 @@ class ArcherTower(db.Model):
     AT_damage=db.Column(db.Integer,nullable=False)
 
     Unlock_THLvl=db.Column(db.Integer, nullable=False)
-    Time_Upgrade=db.Column(db.DateTime, nullable=False)
-    fecha_mejora=db.Column(db.DateTime, default=datetime.datetime.now())
+    upgrade_AT=db.Column(db.Integer, nullable=False)
+    moneygiven_AT=db.Column(db.Integer,nullable=False)
 
     
 class Canon(db.Model):
@@ -44,8 +44,8 @@ class Canon(db.Model):
     Canon_damage=db.Column(db.Integer,nullable=False)
 
     Unlock_THLvl=db.Column(db.Integer, nullable=False)
-    Time_Upgrade=db.Column(db.DateTime, nullable=False)
-    fecha_mejora=db.Column(db.DateTime, default=datetime.datetime.now())
+    upgrade_Canon=db.Column(db.Integer, nullable=False)
+    moneygiven_Canon=db.Column(db.Integer,nullable=False)
 
 #WT=Wizard Tower
 class WizardTower(db.Model):
@@ -55,5 +55,5 @@ class WizardTower(db.Model):
     WT_damage=db.Column(db.Integer,nullable=False)
 
     Unlock_THLvl=db.Column(db.Integer, nullable=False)
-    Time_Upgrade=db.Column(db.DateTime, nullable=False)
-    fecha_mejora=db.Column(db.DateTime, default=datetime.datetime.now())
+    upgrade_WT=db.Column(db.Integer, nullable=False)
+    moneygiven_WT=db.Column(db.Integer,nullable=False)
