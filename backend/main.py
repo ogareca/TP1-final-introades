@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from models import db,User,TownHall,ArcherTower,Canon,WizardTower
+from models import db,User,TownHall,ArcherTower,Canon
 from flask_cors import CORS
 
 app=Flask(__name__)
@@ -34,7 +34,6 @@ def users():
                 'Town_Hall':user.id_TH,
                 'Archer_Tower':user.id_ArcherTower,
                 'Canon':user.id_Canon,
-                'Wizard_Tower':user.id_Wizard,
                 'money':user.money
             }
             users_data.append(user_data)
@@ -54,7 +53,6 @@ def usuario(user_id):
             'Town_Hall':usuario.id_TH,
             'Archer_Tower':usuario.id_ArcherTower,
             'Canon':usuario.id_Canon,
-            'Wizard_Tower':usuario.id_Wizard,
             'money':usuario.money
             }
         return jsonify(usuario_data)
@@ -73,7 +71,6 @@ def townhalls():
                 'healt':th.TH_hp,
                 'img':th.img,
                 'upgrade_cost':th.upgrade_TH,
-                'money_given':th.moneygiven_TH,
             }
             townhalls_data.append(townhall_data)
         return jsonify(townhalls_data)
@@ -89,7 +86,6 @@ def townhall(id):
             'healt':th.TH_hp,
             'img':th.img,
             'upgrade_cost':th.upgrade_TH,
-            'money_given':th.moneygiven_TH,
         }
         return jsonify(townhall_data)
     except:
