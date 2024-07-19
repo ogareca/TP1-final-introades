@@ -1,7 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 
-
-
 db= SQLAlchemy()
 
 #User table
@@ -19,7 +17,6 @@ class User(db.Model):
 class TownHall(db.Model):
     __tablename__='town_hall'
     id_th= db.Column(db.Integer, primary_key=True)
-    TH_hp=db.Column(db.Integer,nullable=False)
     img=db.Column(db.String(255),nullable=False)
     upgrade_TH=db.Column(db.Integer, nullable=False)
 
