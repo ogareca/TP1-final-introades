@@ -68,7 +68,6 @@ def townhalls():
         for th in townhall:
             townhall_data={
                 'level':th.id_th,
-                'healt':th.TH_hp,
                 'img':th.img,
                 'upgrade_cost':th.upgrade_TH,
             }
@@ -83,7 +82,6 @@ def townhall(id):
         th=TownHall.query.get(id)
         townhall_data={
             'level':th.id_th,
-            'healt':th.TH_hp,
             'img':th.img,
             'upgrade_cost':th.upgrade_TH,
         }
