@@ -6,7 +6,7 @@ app=Flask(__name__)
 CORS(app)
 
 port=5000                                                  #postgre user                        database
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql+psycopg2://postgres:postgres@localhost:5432/TP1intro'
+app.config['SQLALCHEMY_DATABASE_URI']='postgresql+psycopg2://postgres:postgres@localhost:5432/tp1intro'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False                 #postgre password
 
 
@@ -88,6 +88,27 @@ def townhall(id):
         return jsonify(townhall_data)
     except:
         return jsonify({"mensaje":"No hay usuarios"})
+
+@app.route('/create_user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    name = data.get('name')
+    id_TH = data.get('id_TH', 1)
+    id_ArcherTower = data.get('id_ArcherTower', 1)  
+    id_Canon = data.get('id_Canon', 1)  
+
+    if not name:
+        return jsonify({"error": "El nombre es requerido"}), 400
+
+    try:
+        new_user = User(name=name, id_TH=id_TH, id_ArcherTower=id_ArcherTower, id_Canon=id_Canon, money=0)
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "Usuario creado", "id": new_user.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 
 #create tables
 if __name__ == '__main__':

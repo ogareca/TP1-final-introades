@@ -9,65 +9,68 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 
-<body data-bs-theme="dark"> 
-    <div class="container" >
-        <div class="row" >
-            <div class="col" >
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="row">
+            <div class="col">
                 <h1>Create User</h1>
             </div>
-            
         </div>
     </div>
     <br><br>
     <div class="container" id="all_users">
         <div class="row g-4" id="usuarios">
-            <form>
+            <form id="createUserForm">
                 <div class="form-group">
-                  <label for="exampleInputEmail1">Name</label>
-                  <input type="text" class="form-control" id="Username" placeholder="Enter user">
-                </div>
-                <div class="form-group">
-                  <label for="exampleInputPassword1">Password</label>
-                  <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    <label for="Username">Name</label>
+                    <input type="text" class="form-control" id="Username" placeholder="Enter user">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
-              </form>
+            </form>
         </div>
-    <br>
+        <br>
     </div>
-    
+
     <style>
-    #all_users{
-        background-color:#30303A; 
-        border-radius: 1em;   }
-    button{
-        margin: 0.5em;
-    }
-    
+        #all_users {
+            background-color: #30303A;
+            border-radius: 1em;
+        }
+
+        button {
+            margin: 0.5em;
+        }
     </style>
+
     <script>
-        let ayuntamiento;       
-        
-        function response_received(response) {
-            return response.json()
-        }
+        document.getElementById('createUserForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const name = document.getElementById('Username').value;
 
-        function parse_data(content) {
-            console.log("TENGO LA LISTA DE usuarios!")
-            console.log(content)
-            }
-       
-        function request_error(error) {
-            console.log("ERROR")
-            console.log(error);
-        }
-
-            
-        fetch(`http://127.0.0.1:5000/usuarios/${id}`)
-            .then(response_received)  
-            .then(parse_data)
-            .catch(request_error)
-
+            fetch('http://127.0.0.1:5000/create_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: name, id_TH: 1, id_ArcherTower: 1, id_Canon: 1 }), //Valores por default
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'No se pudo crear el usuario');
+                    });
+                })
+                .then(data => {
+                    console.log('Usuario creado:', data);
+                    alert('Usuario Creado');
+                })
+                .catch(error => {
+                    console.error('No se pudo crear el usuario:', error);
+                    alert('No se pudo crear el usuario: ' + error.message);
+                });
+        });
     </script>
 </body>
 
