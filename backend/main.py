@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify
 from models import db,User,TownHall,ArcherTower,Canon
 from flask_cors import CORS
@@ -6,7 +7,7 @@ app=Flask(__name__)
 CORS(app)
 
 port=5000                                                  #postgre user                        database
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql+psycopg2://postgres:postgres@localhost:5432/tp1intro'
+app.config['SQLALCHEMY_DATABASE_URI']='postgresql+psycopg2://postgres:postgres@localhost:5432/TP1intro'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False                 #postgre password
 
 
@@ -107,6 +108,76 @@ def create_user():
         return jsonify({"message": "Usuario creado", "id": new_user.id}), 201
     except Exception as e:
         db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/canon')
+def canons():
+    try:
+        canons = Canon.query.all()
+        canons_data = []
+        for canon in canons:
+            canon_data = { 
+            'level': canon.id_Canon, 
+            'img': canon.img, 
+            'unlock':canon.Unlock_THLvl,
+            'upgrade_cost': canon.upgrade_Canon,
+            'money_given':canon.moneygiven_Canon }
+            
+            canons_data.append(canon_data)
+        return jsonify(canons_data)
+    except:
+        return jsonify({"mensaje": "No hay cañones"})
+
+@app.route('/archertower')
+def archertowers():
+    try:
+        archertowers = ArcherTower.query.all()
+        archertowers_data = []
+        for tower in archertowers:
+            tower_data = { 
+            'level': tower.id_AT, 
+            'img': tower.img, 
+            'unlock':tower.Unlock_THLvl,
+            'upgrade_cost': tower.upgrade_AT,
+            'money_given':tower.moneygiven_AT }           
+                     
+            archertowers_data.append(tower_data)
+        return jsonify(archertowers_data)
+    except:
+        return jsonify({"mensaje": "No hay torres de arqueros"})
+
+@app.route('/canon/<id>')
+def canon(id):
+    try:
+        canon = Canon.query.get(id)
+        if not canon:
+            return jsonify({"mensaje": "No hay cañon con ese ID"}), 404
+            canon_data = { 
+            'level': canon.id_Canon, 
+            'img': canon.img, 
+            'unlock':canon.Unlock_THLvl,
+            'upgrade_cost': canon.upgrade_Canon,
+            'money_given':canon.moneygiven_Canon } 
+        return jsonify(canon_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/archertower/<id>')
+def archertower(id):
+    try:
+        tower = ArcherTower.query.get(id)
+        if not tower:
+            return jsonify({"mensaje": "No hay torre de arquero con ese ID"}), 404
+            tower_data = { 
+            'level': tower.id_AT, 
+            'img': tower.img, 
+            'unlock':tower.Unlock_THLvl,
+            'upgrade_cost': tower.upgrade_AT,
+            'money_given':tower.moneygiven_AT } 
+        return jsonify(tower_data)
+    except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 

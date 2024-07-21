@@ -89,7 +89,7 @@
         </div>
     </div>
 
-    <h2 class="text-center mt-4">Ganancias Totales: $<span id="ganancias-totales">0</span></h2>
+    <h2 class="text-center mt-4">Ganancias Totales: $<div id="ganancia_total"></div></h2>
     <div class="container text-center mt-4" id="info">
         <button class="btn btn-success" onclick="recaudarGanancias()">Recaudar Todo</button>
     </div>
@@ -112,11 +112,67 @@
         }
 
         // Función para recaudar todas las ganancias
-        function recaudarGanancias() {
+        /*function recaudarGanancias() {
             console.log('Recaudando todas las ganancias');
             let ganancias = parseInt(document.getElementById('ganancias-totales').textContent);
             // Aquí podrías agregar la lógica de incremento de ganancias
+        }*/
+
+
+        function response_received(response) {
+            return response.json()
         }
+        function request_error(error) {
+            console.log("ERROR");
+            console.log(error);
+        }
+
+        let monto_inicial, torre_tipo, cañon_tipo;
+
+        function parse_data_monto(content){
+            monto_inicial = content.money;
+            torre_tipo=content.Archer_Tower;
+            cañon_tipo= content.Canon;
+            }  
+            
+        let torre_ganancia;
+        function parse_tower(content){
+            torre_ganancia= content[torre_tipo].money_given;
+            }
+            
+        let cañon_ganancia;		
+        function parse_canon(content){
+            torre_ganancia= content[cañon_tipo].money_given;
+            }         
+
+        function recaudarGanancias(){
+            fetch("http://127.0.0.1:5000/users/"+id)
+                        .then(response_received)  
+                        .then(parse_data_monto)           
+                        .catch(request_error)
+
+            fetch("http://127.0.0.1:5000/archertower")
+                        .then(response_received)  
+                        .then(parse_tower)
+                        .catch(request_error) 
+                
+            fetch("http://127.0.0.1:5000/canon")
+                        .then(response_received)  
+                        .then(parse_canon)
+                        .catch(request_error)	
+
+            let cobro_total= torre_ganancia + cañon_ganancia + monto_inicial;
+            //aca falta un post para guardar en el money del usuario lo acumulado recien..
+            
+            
+            
+            const container = document.getElementById("ganancia_total")
+            const monto = document.createElement("p")
+            monto.InnerText= cobro_total
+            container.appendChild(monto);
+        }
+
+
 
         // Función para eliminar el personaje
         function eliminarPersonaje() {
