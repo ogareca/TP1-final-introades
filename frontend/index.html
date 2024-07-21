@@ -14,7 +14,7 @@
     <div class="container" >
         <div class="row" >
             <div class="col" >
-                <h1 id="titulo">Users</h1>
+                <h1 id="titulo">Clash of Clans Clicker</h1>
                 <a href="/create" id="button" class="btn btn-success">New user</a>
 
             </div>
@@ -25,15 +25,15 @@
         <div class="row g-4" id="usuarios">
         </div>
     </div>
-    <h2>Town Hall</h2>
+    <h2 class="container">Town Hall</h2>
     <div class="container" id="info">
         <img src="https://clashtipsandtutorials.files.wordpress.com/2014/09/img_0040.png" alt="The image of the clash of clans town halls">
-        <p id="texto">The town hall allows access to more buildings and higher levels for existing buildings. As the Town Hall level increases, the player gets access to stronger buildings such as the Wizard Tower"</p>
+        <p id="texto">The town hall allows access to more buildings and higher levels for existing buildings. As the Town Hall level increases, the player gets access to stronger buildings and the capacity of earning more coins</p>
     </div>
-    <h2>Defenses</h2>
+    <h2 class="container">Defenses</h2>
     <div class="container" id="info">
         <img src="https://static4.wikia.nocookie.net/__cb20130309001824/clash-of-clans/es/images/d/d2/Cannon11.png" alt="The image of the clash of clans canon defense">
-        <p id="texto">Defenses serve to protect your Builder Base and prevent as much damage as possible. Each defense has its own strengths and weaknesses. There are air and ground defenses and defenses that do both things, also they can be single target or splash area</p>
+        <p id="texto">Defenses serve to protect your Builder Base and prevent as much damage as possible. Each defense has its own strengths and weaknesses. As long as you upgrade your defences their price will increase, as the coins you earn each time you click </p>
     </div>
     <style>
     #button{
@@ -43,11 +43,11 @@
         margin-top: 0.5em;}
   
     img{
-        max-width: 100%;
-        max-height: 100%;}
+        max-width: 90%;
+        max-height: 90%;}
     
     #texto{
-        text-align: right; }    
+        text-align: justify; }    
 
     p{
         font-size: 20px;
@@ -69,13 +69,11 @@
     </style>
     
     <script>
+        let Townhalls;
         
         //set town halls image
          function parse_th(content) {
-                for(let index=0;index<content.length;index++){
-                    const img = document.getElementById(index+1);
-                    img.setAttribute("src",content[index].img);
-                }
+                Townhalls=content;
         }
         
         function response_received(response) {
@@ -96,8 +94,16 @@
                 
                 const image = document.createElement("img");
                 image.setAttribute("class", "card-img-top");
-                image.setAttribute("id",content[index].Town_Hall);
                 
+                const th=content[index].Town_Hall; //search for user town hall level
+
+                for(let subindex=0;subindex<Townhalls.length;subindex++){
+                    if(Townhalls[subindex].level===th){
+                        image.setAttribute("src", Townhalls[subindex].img)
+                    } //search the img for user town hall level
+                }
+
+
                 card.setAttribute("href",`/users?id=${content[index].id}`);
 
                 const card_body = document.createElement("div");
@@ -118,16 +124,17 @@
         }
 
             
-        fetch("http://127.0.0.1:5000/users")
-            .then(response_received)  
-            .then(parse_data)
-            .catch(request_error)
 
         fetch("http://127.0.0.1:5000/townhall")
             .then(response_received)  
             .then(parse_th)
             .catch(request_error)      
        
+        fetch("http://127.0.0.1:5000/users")
+            .then(response_received)  
+            .then(parse_data)
+            .catch(request_error)
+
     </script>
 </body>
 
