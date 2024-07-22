@@ -68,6 +68,7 @@ def update_id_th(user_id):
     id_TH=request.json.get("Town_Hall")
     id_ArcherTower=request.json.get("Archer_Tower")
     id_Canon=request.json.get("Canon")
+    money=request.json.get("Coins")
     try:
         user=User.query.get(user_id)
         if not user:
@@ -75,6 +76,7 @@ def update_id_th(user_id):
         user.id_TH=id_TH
         user.id_ArcherTower=id_ArcherTower
         user.id_Canon=id_Canon
+        user.money=money
         db.session.commit()
         return jsonify({"message":"Usuario actualizado","id":user.id}), 200
     except Exception as e:

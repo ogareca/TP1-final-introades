@@ -62,7 +62,7 @@
                     <img id="canon"   alt="Cañón">
                     <div class="card-body">
                         <h5 class="card-title">Cañón</h5>
-                        <p class="card-text">Nivel: <span id="nivel-canon">1</span></p>
+                        <p class="card-text">Nivel: <span id="nivel-canon">1</span><span id="money_given_canon"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('canon')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     <img id="archer_tower"  alt="Torre Arquera">
                     <div class="card-body">
                         <h5 class="card-title">Torre Arquera</h5>
-                        <p class="card-text">Nivel: <span id="nivel-archer_tower">1</span></p>
+                        <p class="card-text">Nivel: <span id="nivel-archer_tower">1</span><span id="money_given_at"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('archer_tower')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -84,7 +84,8 @@
                     <img id="townhall"  alt="Ayuntamiento">
                     <div class="card-body">
                         <h5 class="card-title">Ayuntamiento</h5>
-                        <p class="card-text">Nivel: <span id="nivel-townhall">1</span></p>
+                        <p class="card-text">Nivel: <span id="nivel-townhall">1</span>
+                        <span id="money_given_th"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('townhall')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -92,7 +93,7 @@
         </div>
     </div>
 
-    <h2 class="text-center mt-4" id="coins">Ganancias Totales: $<div id="ganancia_total"></div></h2>
+    <h2 class="text-center mt-4" id="coins">Ganancias Totales: $<span id="nivel-coin"></div></h2>
     <div class="container text-center mt-4" id="info">
         <button class="btn btn-success" onclick="recaudarGanancias()">Recaudar Todo</button>
     </div>
@@ -119,13 +120,7 @@
         // Función para subir de nivel una edificación
         
         
-        
-
-        // Función para obtener el parámetro de la URL
-                function getQueryParam(param) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    return urlParams.get(param);
-                }
+                 
         
                 // Función para cargar los datos del usuario y actualizar la interfaz
                 function cargarDatosUsuario(userId) {
@@ -135,14 +130,14 @@
                             document.getElementById('nivel-townhall').textContent = data.Town_Hall || 1;
                             document.getElementById('nivel-archer_tower').textContent = data.Archer_Tower || 1;
                             document.getElementById('nivel-canon').textContent = data.Canon || 1;
-                            document.getElementById('ganancia_total').textContent = data.money || 0;
+                            document.getElementById('nivel-coin').textContent = data.money || 0;
                         })
                         .catch(error => console.error('Error:', error));
                 }
         
                 // Asignar el ID del usuario al campo oculto y cargar datos del usuario
                 document.addEventListener('DOMContentLoaded', function() {
-                    const userId = getQueryParam('id');
+                    const userId = id;
                     if (userId) {
                         document.getElementById('user-id').value = userId;
                         cargarDatosUsuario(userId);
@@ -152,12 +147,20 @@
                 function subirNivel(tipo) {
                     const userId = document.getElementById('user-id').value;
                     const nivelElemento = document.getElementById(`nivel-${tipo}`);
-                    let nivel = parseInt(nivelElemento.textContent) + 1;
-                    nivelElemento.textContent = nivel;
+                    console.log(nivelElemento)
+                    if(tipo!="coin"){
+                        
+                        let nivel = parseInt(nivelElemento.textContent) + 1;
+                        nivelElemento.textContent = nivel;
+                    }else{
+                        let coins_id=parseInt(nivelElemento.textContent);
+                    }
+                    
         
                     let id_th = parseInt(document.getElementById('nivel-townhall').textContent);
                     let id_AT = parseInt(document.getElementById('nivel-archer_tower').textContent);
                     let id_Canon = parseInt(document.getElementById('nivel-canon').textContent);
+                    let id_coins = parseInt(document.getElementById('nivel-coin').textContent);
         
                     fetch(`http://127.0.0.1:5000/users/${userId}`, {
                         method: "POST",
@@ -167,7 +170,9 @@
                         body: JSON.stringify({
                             Town_Hall: id_th,
                             Archer_Tower: id_AT,
-                            Canon: id_Canon
+                            Canon: id_Canon,
+                            Coins: id_coins
+
                         })
                     })
                     .then((res) => res.json())
@@ -176,51 +181,47 @@
                 }
         
 
-
-        let monto_inicial=100, torre_tipo=1, canon_tipo=1,th_tipo=1;
-
-
         function parse_data_monto(content){
-            monto_inicial = content.money;
-            const coins=document.getElementById("coins");
-            coins.innerHTML+=monto_inicial;
+            let monto_inicial = content.money;
+            const coins=document.getElementById("nivel-coin");
+            coins.innerHTML=monto_inicial;
             
-            torre_tipo=content.Archer_Tower;
             const img_AT=document.getElementById("archer_tower");
             img_AT.setAttribute("class",content.Archer_Tower)
             
-            canon_tipo= content.Canon;
             const img_canon=document.getElementById("canon");
             img_canon.setAttribute("class",content.Canon)
 
-            th_tipo=content.Town_Hall;
             const img_th=document.getElementById("townhall");
             img_th.setAttribute("class",content.Town_Hall);
             }  
             
-        let torre_ganancia;
         function parse_tower(content){
-          //  torre_ganancia= content[torre_tipo].money_given;
+          
             const img=document.getElementById("archer_tower");
             const clase=img.getAttribute("class");  
-            img.setAttribute("src",content[clase].img);
+            img.setAttribute("src",content[clase-1].img);
+
+            const coins_at=document.getElementById("money_given_at");
+            coins_at.setAttribute("class",content[clase-1].money_given);
             }
             
-        let cañon_ganancia;		
         function parse_canon(content){
-            //torre_ganancia= content[cañon_tipo].money_given;
             const img=document.getElementById("canon");
             const clase=img.getAttribute("class");  
-            img.setAttribute("src",content[clase].img);
+            img.setAttribute("src",content[clase-1].img);
+
+            const coins_canon=document.getElementById("money_given_canon");
+            coins_canon.setAttribute("class",content[clase-1].money_given);
             }     
        
         function parse_townhall(content){
             const img=document.getElementById("townhall");
             const clase=img.getAttribute("class");  
-            img.setAttribute("src",content[clase].img);
+            img.setAttribute("src",content[clase-1].img);
             }
 
-            function response_received(response) {
+        function response_received(response) {
             return response.json()
         }
         function request_error(error) {
@@ -228,61 +229,28 @@
             console.log(error);
         } 
     
-        
-        fetch("http://127.0.0.1:5000/users/"+id)
-                        .then(response_received)  
-                        .then(parse_data_monto)           
-                        .catch(request_error)
-
-        fetch("http://127.0.0.1:5000/archertower")
-                        .then(response_received)  
-                        .then(parse_tower)
-                        .catch(request_error) 
-
-         fetch("http://127.0.0.1:5000/canon")
-                        .then(response_received)  
-                        .then(parse_canon)
-                        .catch(request_error)	
-        
-        fetch("http://127.0.0.1:5000/townhall")
-                        .then(response_received)  
-                        .then(parse_townhall)
-                        .catch(request_error)	
-
-
-
         function recaudarGanancias(){
-            fetch("http://127.0.0.1:5000/users/"+id)
-                        .then(response_received)  
-                        .then(parse_data_monto)           
-                        .catch(request_error)
+            const container = document.getElementById("nivel-coin");
+            let coin=container.innerHTML;
+           
+            const ArcherTower_id=document.getElementById("money_given_at");
+            let clase_AT=ArcherTower_id.getAttribute("class");
+            let money_at=parseInt(clase_AT)
+            
 
-            fetch("http://127.0.0.1:5000/archertower")
-                        .then(response_received)  
-                        .then(parse_tower)
-                        .catch(request_error) 
-                
-            fetch("http://127.0.0.1:5000/canon")
-                        .then(response_received)  
-                        .then(parse_canon)
-                        .catch(request_error)	
+            const canon_id=document.getElementById("money_given_canon");
+            let clase_canon=canon_id.getAttribute("class");
+            let money_canon=parseInt(clase_canon);
+            
 
-            fetch("http://127.0.0.1:5000/townhall")
-                        .then(response_received)  
-                        .then(parse_townhall)
-                        .catch(request_error)	
-
-     
-
-           // let cobro_total= torre_ganancia + cañon_ganancia + monto_inicial;
-            //aca falta un post para guardar en el money del usuario lo acumulado recien..
+            coin=parseInt(coin)+money_at+money_canon;
             
             
-            
-            const container = document.getElementById("ganancia_total").innerHTML+=1;
+            container.innerHTML=coin;
+            console.log(coin);
+            subirNivel("coin");
             
         }
-
 
 
         // Función para eliminar el personaje
@@ -326,6 +294,28 @@
                 document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
             }
         }
+
+
+        
+        fetch("http://127.0.0.1:5000/users/"+id)
+                        .then(response_received)  
+                        .then(parse_data_monto)           
+                        .catch(request_error)
+
+        fetch("http://127.0.0.1:5000/archertower")
+                        .then(response_received)  
+                        .then(parse_tower)
+                        .catch(request_error) 
+
+         fetch("http://127.0.0.1:5000/canon")
+                        .then(response_received)  
+                        .then(parse_canon)
+                        .catch(request_error)	
+        
+        fetch("http://127.0.0.1:5000/townhall")
+                        .then(response_received)  
+                        .then(parse_townhall)
+                        .catch(request_error)	
     </script>
 </body>
 </html>
