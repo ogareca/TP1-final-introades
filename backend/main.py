@@ -121,6 +121,11 @@ def create_user():
 
     if not name:
         return jsonify({"error": "El nombre es requerido"}), 400
+    
+    # Verificar si el nombre ya está en uso
+    existing_user = User.query.filter_by(name=name).first()
+    if existing_user:
+        return jsonify({"error": "El nombre ya está en uso"}), 400
 
     try:
         new_user = User(name=name, id_TH=id_TH, id_ArcherTower=id_ArcherTower, id_Canon=id_Canon, money=0)
@@ -131,6 +136,19 @@ def create_user():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+@app.route('/users/<user_id>', methods=['DELETE'])
+def eliminar_usuario(user_id):
+    try:
+        usuario = User.query.get(user_id)
+        if not usuario:
+            return jsonify({"mensaje": "Usuario no encontrado"}), 404
+
+        db.session.delete(usuario)
+        db.session.commit()
+        return jsonify({"mensaje": "Usuario eliminado exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/canon')
 def canons():

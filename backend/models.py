@@ -6,7 +6,7 @@ db= SQLAlchemy()
 class User(db.Model):
     __tablename__='user'
     id= db.Column(db.Integer, primary_key=True)
-    name= db.Column(db.String(255),nullable=False)
+    name= db.Column(db.String(255), unique=True, nullable=False)
     id_TH=db.Column(db.Integer, db.ForeignKey('town_hall.id_th'),default=1)
     id_ArcherTower=db.Column(db.Integer, db.ForeignKey('archer_tower.id_AT'),default=1)
     id_Canon=db.Column(db.Integer, db.ForeignKey('canon.id_Canon'),default=1)
