@@ -62,7 +62,7 @@
                     <img id="canon"   alt="Cañón">
                     <div class="card-body">
                         <h5 class="card-title">Cañón</h5>
-                        <p class="card-text">Nivel: <span id="nivel-canon">1</span><span id="money_given_canon"></span><span id="cost_canon"></span></p>
+                        <p class="card-text">Nivel: <span id="unlock_canon"></span><span id="nivel-canon">1</span><span id="money_given_canon"></span><span id="cost_canon"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('canon')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     <img id="archer_tower"  alt="Torre Arquera">
                     <div class="card-body">
                         <h5 class="card-title">Torre Arquera</h5>
-                        <p class="card-text">Nivel: <span id="nivel-archer_tower">1</span><span id="money_given_at"></span><span id="cost_archer_tower"></span></p>
+                        <p class="card-text">Nivel: <span id="unlock_archer_tower"></span><span id="nivel-archer_tower">1</span><span id="money_given_at"></span><span id="cost_archer_tower"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('archer_tower')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -142,13 +142,25 @@
                         document.getElementById('user-id').value = userId;
                         cargarDatosUsuario(userId);
                     }
+                    
                 });
-        
+                         
+
                 function subirNivel(tipo) {
                     const userId = document.getElementById('user-id').value;
                     const nivelElemento = document.getElementById(`nivel-${tipo}`);
-                    console.log(nivelElemento)
-                    if(tipo!="coin"){
+                    
+                    let townhall_id = parseInt(document.getElementById('nivel-townhall').textContent);
+                    let unlock=0;
+
+                    if(tipo!="townhall" && tipo!="coin"){
+
+                        unlock=document.getElementById(`unlock_${tipo}`);
+                        unlock=parseInt(unlock.getAttribute("class"));
+                        
+                    }
+                    if(tipo!='coin'){
+                       
                         let plata = parseInt(document.getElementById('nivel-coin').textContent);
                         let subir=document.getElementById(`cost_${tipo}`);
                         let cuanto_sale=subir.getAttribute("class");
@@ -158,7 +170,7 @@
                         console.log(`plata:`+plata);
 
 
-                        if(plata>=parseInt(cuanto_sale)){
+                        if(plata>=parseInt(cuanto_sale) && townhall_id>=unlock){
                             let nivel = parseInt(nivelElemento.textContent) + 1;
                             nivelElemento.textContent = nivel;
                             plata=plata-parseInt(cuanto_sale);
@@ -166,8 +178,11 @@
                             let ingreso=document.getElementById(`nivel-coin`);
                             ingreso.innerHTML=plata;
                             console.log(`baja plata:`+plata)
-                        }else{
+                        }else if (plata<parseInt(cuanto_sale)){
                             alert("You need more coins");
+                            return;
+                        }else{
+                            alert("You need to increase your town hall level");
                             return;
                         }
                         
@@ -198,6 +213,9 @@
                     .then((res) => res.json())
                     .then(data => console.log("Datos actualizados:", data))
                     .catch((error) => console.log("ERROR", error));
+
+                    
+
                 }
         
 
@@ -227,6 +245,9 @@
 
             const cost_at=document.getElementById("cost_archer_tower");
             cost_at.setAttribute("class",content[clase-1].upgrade_cost);
+
+            const unlock_at=document.getElementById("unlock_archer_tower");
+            unlock_at.setAttribute("class",content[clase-1].unlock);
             }
             
         function parse_canon(content){
@@ -239,6 +260,9 @@
 
             const cost_canon=document.getElementById("cost_canon");
             cost_canon.setAttribute("class",content[clase-1].upgrade_cost);
+
+            const unlock_ca=document.getElementById("unlock_canon");
+            unlock_ca.setAttribute("class",content[clase-1].unlock)
             }     
        
         function parse_townhall(content){
@@ -278,7 +302,7 @@
             container.innerHTML=coin;
             console.log(coin);
             subirNivel("coin");
-            
+
         }
 
 
