@@ -45,6 +45,8 @@
     </style>
 </head>
 <body data-bs-theme="dark">
+    <input type="hidden" id="user-id">
+
     <div class="container">
         <div class="row">
             <div class="col">
@@ -57,7 +59,7 @@
         <div class="row g-4 centrado" id="edificaciones">
             <div class="col-md-4 edificio-card">
                 <div class="card">
-                    <img id="canon"class="card-img-top edificio-image" alt="Cañón">
+                    <img id="canon"   alt="Cañón">
                     <div class="card-body">
                         <h5 class="card-title">Cañón</h5>
                         <p class="card-text">Nivel: <span id="nivel-canon">1</span></p>
@@ -68,7 +70,7 @@
 
             <div class="col-md-4 edificio-card">
                 <div class="card">
-                    <img id="archer_tower" class="card-img-top edificio-image" alt="Torre Arquera">
+                    <img id="archer_tower"  alt="Torre Arquera">
                     <div class="card-body">
                         <h5 class="card-title">Torre Arquera</h5>
                         <p class="card-text">Nivel: <span id="nivel-archer_tower">1</span></p>
@@ -79,7 +81,7 @@
 
             <div class="col-md-4 edificio-card">
                 <div class="card">
-                    <img id="townhall" class="card-img-top edificio-image" alt="Ayuntamiento">
+                    <img id="townhall"  alt="Ayuntamiento">
                     <div class="card-body">
                         <h5 class="card-title">Ayuntamiento</h5>
                         <p class="card-text">Nivel: <span id="nivel-townhall">1</span></p>
@@ -105,8 +107,8 @@
     </div>
     <style>
         img{
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 100%;
+            max-height: 100%;
             height: 20em;
             width:10em;
         }
@@ -117,10 +119,65 @@
         // Función para subir de nivel una edificación
         
         
-        let monto_inicial=100;
-        let torre_tipo=1 
-        let canon_tipo=1
-        let th_tipo=1;
+        
+
+        // Función para obtener el parámetro de la URL
+                function getQueryParam(param) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(param);
+                }
+        
+                // Función para cargar los datos del usuario y actualizar la interfaz
+                function cargarDatosUsuario(userId) {
+                    fetch(`http://127.0.0.1:5000/users/${userId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('nivel-townhall').textContent = data.Town_Hall || 1;
+                            document.getElementById('nivel-archer_tower').textContent = data.Archer_Tower || 1;
+                            document.getElementById('nivel-canon').textContent = data.Canon || 1;
+                            document.getElementById('ganancia_total').textContent = data.money || 0;
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+        
+                // Asignar el ID del usuario al campo oculto y cargar datos del usuario
+                document.addEventListener('DOMContentLoaded', function() {
+                    const userId = getQueryParam('id');
+                    if (userId) {
+                        document.getElementById('user-id').value = userId;
+                        cargarDatosUsuario(userId);
+                    }
+                });
+        
+                function subirNivel(tipo) {
+                    const userId = document.getElementById('user-id').value;
+                    const nivelElemento = document.getElementById(`nivel-${tipo}`);
+                    let nivel = parseInt(nivelElemento.textContent) + 1;
+                    nivelElemento.textContent = nivel;
+        
+                    let id_th = parseInt(document.getElementById('nivel-townhall').textContent);
+                    let id_AT = parseInt(document.getElementById('nivel-archer_tower').textContent);
+                    let id_Canon = parseInt(document.getElementById('nivel-canon').textContent);
+        
+                    fetch(`http://127.0.0.1:5000/users/${userId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            Town_Hall: id_th,
+                            Archer_Tower: id_AT,
+                            Canon: id_Canon
+                        })
+                    })
+                    .then((res) => res.json())
+                    .then(data => console.log("Datos actualizados:", data))
+                    .catch((error) => console.log("ERROR", error));
+                }
+        
+
+
+        let monto_inicial=100, torre_tipo=1, canon_tipo=1,th_tipo=1;
 
 
         function parse_data_monto(content){
@@ -129,85 +186,39 @@
             coins.innerHTML+=monto_inicial;
             
             torre_tipo=content.Archer_Tower;
+            const img_AT=document.getElementById("archer_tower");
+            img_AT.setAttribute("class",content.Archer_Tower)
+            
             canon_tipo= content.Canon;
+            const img_canon=document.getElementById("canon");
+            img_canon.setAttribute("class",content.Canon)
+
             th_tipo=content.Town_Hall;
-         
+            const img_th=document.getElementById("townhall");
+            img_th.setAttribute("class",content.Town_Hall);
             }  
-            
-            console.log(torre_tipo);
-        function subirNivel(tipo) {
-           let nivel=parseInt(document.getElementById(`nivel-${tipo}`).textContent) + 1
-            document.getElementById(`nivel-${tipo}`).textContent = nivel;
-            
-            console.log(torre_tipo);
-
-            console.log(tipo);
-            let id_th;
-            let id_AT;
-            let id_Canon;
-
-            if(tipo==="townhall"){
-                id_th=nivel;
-                id_AT=torre_tipo;
-                id_Canon=canon_tipo;
-                console.log("hola");
-            } else if(tipo==="archer_tower"){
-                id_AT=nivel;
-                id_Canon=canon_tipo;
-                id_th=th_tipo;
-            } else{
-                id_Canon=nivel;
-                id_th=th_tipo;
-                id_AT=torre_tipo;
-            }
-        
-            console.log(id_th)
-            console.log(id_AT)
-            console.log(id_Canon)
-            fetch("http://127.0.0.1:5000/users/"+id, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    Town_Hall: id_th,
-                    Archer_Tower: id_AT,
-                    Canon: id_Canon
-                })
-            }).then((res) => res.json())
-                .then(parse_data_monto)
-                .catch((error) => console.log("ERROR", error))
-            //verificarVictoria();
-        }
-
-        // Función para recaudar todas las ganancias
-        /*function recaudarGanancias() {
-            console.log('Recaudando todas las ganancias');
-            let ganancias = parseInt(document.getElementById('ganancias-totales').textContent);
-            // Aquí podrías agregar la lógica de incremento de ganancias
-        }*/
-
-
-       
             
         let torre_ganancia;
         function parse_tower(content){
           //  torre_ganancia= content[torre_tipo].money_given;
             const img=document.getElementById("archer_tower");
-            img.setAttribute("src",content[torre_tipo-1].img)
+            const clase=img.getAttribute("class");  
+            img.setAttribute("src",content[clase].img);
             }
             
         let cañon_ganancia;		
         function parse_canon(content){
             //torre_ganancia= content[cañon_tipo].money_given;
             const img=document.getElementById("canon");
-            img.setAttribute("src",content[canon_tipo-1].img)
-            }         
+            const clase=img.getAttribute("class");  
+            img.setAttribute("src",content[clase].img);
+            }     
        
         function parse_townhall(content){
             const img=document.getElementById("townhall");
-            img.setAttribute("src",content[th_tipo-1].img)
-}
+            const clase=img.getAttribute("class");  
+            img.setAttribute("src",content[clase].img);
+            }
 
             function response_received(response) {
             return response.json()
@@ -216,7 +227,13 @@
             console.log("ERROR");
             console.log(error);
         } 
+    
         
+        fetch("http://127.0.0.1:5000/users/"+id)
+                        .then(response_received)  
+                        .then(parse_data_monto)           
+                        .catch(request_error)
+
         fetch("http://127.0.0.1:5000/archertower")
                         .then(response_received)  
                         .then(parse_tower)
@@ -232,10 +249,6 @@
                         .then(parse_townhall)
                         .catch(request_error)	
 
-        fetch("http://127.0.0.1:5000/users/"+id)
-                        .then(response_received)  
-                        .then(parse_data_monto)           
-                        .catch(request_error)
 
 
         function recaudarGanancias(){
