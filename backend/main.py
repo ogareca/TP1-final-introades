@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from models import db,User,TownHall,ArcherTower,Canon
 from flask_cors import CORS
 
+
 app=Flask(__name__)
 CORS(app)
 
@@ -19,6 +20,8 @@ def hell_world():
     <h1>Welcome to my heroes API</h1>
     <ul><a href="/users">Go to all users</a></ul>
     <ul><a href="/townhall">Go to all town hall</a></ul>
+    <ul><a href="/archertower">Go to all archer tower</a></ul>
+    <ul><a href="/canon">Go to all canon</a></ul>
     </body>
     </html>
     """
@@ -44,7 +47,7 @@ def users():
 
 
 
-@app.route('/users/<user_id>')
+@app.route('/users/<user_id>',methods=['GET'])
 def usuario(user_id):
     try:
         usuario=User.query.get(user_id)
@@ -59,6 +62,24 @@ def usuario(user_id):
         return jsonify(usuario_data)
     except:
         return jsonify({"mensaje":"No hay usuarios"})
+
+@app.route('/users/<user_id>',methods=['POST'])
+def update_id_th(user_id):
+    id_TH=request.json.get("Town_Hall")
+    id_ArcherTower=request.json.get("Archer_Tower")
+    id_Canon=request.json.get("Canon")
+    try:
+        user=User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+        user.id_TH=id_TH
+        user.id_ArcherTower=id_ArcherTower
+        user.id_Canon=id_Canon
+        db.session.commit()
+        return jsonify({"message":"Usuario actualizado","id":user.id}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error":str(e)}),500
 
 
 @app.route('/townhall')
@@ -147,38 +168,7 @@ def archertowers():
     except:
         return jsonify({"mensaje": "No hay torres de arqueros"})
 
-@app.route('/canon/<id>')
-def canon(id):
-    try:
-        canon = Canon.query.get(id)
-        if not canon:
-            return jsonify({"mensaje": "No hay cañon con ese ID"}), 404
-            canon_data = { 
-            'level': canon.id_Canon, 
-            'img': canon.img, 
-            'unlock':canon.Unlock_THLvl,
-            'upgrade_cost': canon.upgrade_Canon,
-            'money_given':canon.moneygiven_Canon } 
-        return jsonify(canon_data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
-
-@app.route('/archertower/<id>')
-def archertower(id):
-    try:
-        tower = ArcherTower.query.get(id)
-        if not tower:
-            return jsonify({"mensaje": "No hay torre de arquero con ese ID"}), 404
-            tower_data = { 
-            'level': tower.id_AT, 
-            'img': tower.img, 
-            'unlock':tower.Unlock_THLvl,
-            'upgrade_cost': tower.upgrade_AT,
-            'money_given':tower.moneygiven_AT } 
-        return jsonify(tower_data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 #create tables
