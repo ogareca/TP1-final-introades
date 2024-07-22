@@ -62,7 +62,7 @@
                     <img id="canon"   alt="Cañón">
                     <div class="card-body">
                         <h5 class="card-title">Cañón</h5>
-                        <p class="card-text">Nivel: <span id="nivel-canon">1</span><span id="money_given_canon"></span></p>
+                        <p class="card-text">Nivel: <span id="nivel-canon">1</span><span id="money_given_canon"></span><span id="cost_canon"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('canon')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     <img id="archer_tower"  alt="Torre Arquera">
                     <div class="card-body">
                         <h5 class="card-title">Torre Arquera</h5>
-                        <p class="card-text">Nivel: <span id="nivel-archer_tower">1</span><span id="money_given_at"></span></p>
+                        <p class="card-text">Nivel: <span id="nivel-archer_tower">1</span><span id="money_given_at"></span><span id="cost_archer_tower"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('archer_tower')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Ayuntamiento</h5>
                         <p class="card-text">Nivel: <span id="nivel-townhall">1</span>
-                        <span id="money_given_th"></span></p>
+                        <span id="money_given_th"></span> <span id="cost_townhall"></span></p>
                         <button class="btn btn-primary" onclick="subirNivel('townhall')">Subir de Nivel</button>
                     </div>
                 </div>
@@ -149,9 +149,29 @@
                     const nivelElemento = document.getElementById(`nivel-${tipo}`);
                     console.log(nivelElemento)
                     if(tipo!="coin"){
+                        let plata = parseInt(document.getElementById('nivel-coin').textContent);
+                        let subir=document.getElementById(`cost_${tipo}`);
+                        let cuanto_sale=subir.getAttribute("class");
+
+                        console.log(`cuanto sale:`+cuanto_sale);
+                        console.log(`subir:`+subir);
+                        console.log(`plata:`+plata);
+
+
+                        if(plata>=parseInt(cuanto_sale)){
+                            let nivel = parseInt(nivelElemento.textContent) + 1;
+                            nivelElemento.textContent = nivel;
+                            plata=plata-parseInt(cuanto_sale);
+                            
+                            let ingreso=document.getElementById(`nivel-coin`);
+                            ingreso.innerHTML=plata;
+                            console.log(`baja plata:`+plata)
+                        }else{
+                            alert("You need more coins");
+                            return;
+                        }
                         
-                        let nivel = parseInt(nivelElemento.textContent) + 1;
-                        nivelElemento.textContent = nivel;
+
                     }else{
                         let coins_id=parseInt(nivelElemento.textContent);
                     }
@@ -204,6 +224,9 @@
 
             const coins_at=document.getElementById("money_given_at");
             coins_at.setAttribute("class",content[clase-1].money_given);
+
+            const cost_at=document.getElementById("cost_archer_tower");
+            cost_at.setAttribute("class",content[clase-1].upgrade_cost);
             }
             
         function parse_canon(content){
@@ -213,12 +236,18 @@
 
             const coins_canon=document.getElementById("money_given_canon");
             coins_canon.setAttribute("class",content[clase-1].money_given);
+
+            const cost_canon=document.getElementById("cost_canon");
+            cost_canon.setAttribute("class",content[clase-1].upgrade_cost);
             }     
        
         function parse_townhall(content){
             const img=document.getElementById("townhall");
             const clase=img.getAttribute("class");  
             img.setAttribute("src",content[clase-1].img);
+
+            const cost_th=document.getElementById("cost_townhall");
+            cost_th.setAttribute("class",content[clase-1].upgrade_cost);
             }
 
         function response_received(response) {
@@ -256,7 +285,7 @@
         // Función para eliminar el personaje
         function eliminarPersonaje() {
             if (confirm('¿Estás seguro de que quieres eliminar este personaje?')) {
-                const userId = getQueryParam('id');
+                const userId = id;
 
                 if (!userId) {
                     alert('No se pudo encontrar el ID del usuario');
